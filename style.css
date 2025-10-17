@@ -1,87 +1,120 @@
-*{
-    padding: 0;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
     margin: 0;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: #e0e0e0;
+    overflow: hidden;
 }
 
-body{
-    background-color: #14213d;
+h1 {
+    font-size: 3.5em;
+    margin-bottom: 30px;
+    color: #e0e0e0; /* Brighter color for the title */
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
 }
 
-body.dark{
-    background-color: #1a1d23;
-}
-
-.heading{
-    color: #e5e5e5;
-    text-align: center;
-    margin: 10px;
-}
-
-.container{
-    height: 70vh;
+.score-board {
     display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.game{
-    text-align: center;
-    height: 60vmin;
-    width: 60vmin;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5vmin;
+    justify-content: space-around;
+    width: 320px;
+    margin-bottom: 20px;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.box{
-    height: 18vmin;
-    width: 18vmin;
-    border-radius: 1rem;
-    border: 1px solid black;
-    box-shadow: 0 0 1rem rgba(0,0,0,0.3);
-    font-size: 10vmin;
-    font-weight: 500px;
-    color: #00b4d8;
-    background-color: 	#f0f8ff;
-}
-
-#message{
-    font-size: 2.5vmin;
+.score {
+    font-size: 1.6em;
     font-weight: bold;
-    text-align: center;
-    color: #00b4d8;
-    margin: 10px;
+    padding: 5px 15px;
+    border-radius: 5px;
+    color: #ffffff; /* Brighter color for scores */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.hide{
-    display: none;
+.x-score {
+    background-color: #e94560;
 }
 
-.reset-btn{
+.o-score {
+    background-color: #0f3460;
+}
+
+.game-board {
+    position: relative; /* Added for correct positioning of the winning line */
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 8px;
+    background-color: #0f3460;
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    background-color: #1a1a2e;
     display: flex;
-    justify-content: space-evenly;
     align-items: center;
+    justify-content: center;
+    font-size: 3.8em; /* Slightly larger font for cell content */
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 10px;
+    color: #ffffff; /* Brighter color for cell content */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.Fbuttons{
-    background-color: #00b4d8;
-    color: aliceblue;
-    border-radius: 1rem;
-    padding: 1rem;
-    font-size: 1.2rem;
+.cell:hover {
+    background-color: #2e3a59;
+    transform: scale(1.05);
+}
+
+#reset-button {
+    margin-top: 40px;
+    padding: 12px 25px;
+    font-size: 1.2em;
+    cursor: pointer;
+    background-color: #e94560;
+    color: #e0e0e0;
     border: none;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-
-footer {
-  position: fixed;
-  bottom: 0;
-  height: 20px;
-  font-size: 20px;
-  width: 100%;
-  background-color: #333;
-  color: white;
-  text-align: center;
-  padding: 10px;
+#reset-button:hover {
+    background-color: #c2314a;
+    transform: translateY(-2px);
 }
+
+.winning-message {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #e94560;
+    margin-bottom: 20px;
+    height: 1.2em; /* Reserve space for the message */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.winning-line {
+    position: absolute;
+    background-color: #f0f0f0; /* Color of the winning line */
+    height: 5px; /* Default thickness */
+    width: 0; /* Initially hidden */
+    transition: width 0.5s ease-out, transform 0.5s ease-out;
+    z-index: 10;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+    transform-origin: center center; /* Rotate around its center */
+}
+/* Specific classes will be added by JS to trigger transitions, but dimensions are set by JS */

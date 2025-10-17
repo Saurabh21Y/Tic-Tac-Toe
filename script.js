@@ -1,96 +1,130 @@
-//fet6ching the details
-let boxes=document.querySelectorAll(".box");
-let resetBtn=document.querySelector("#reset-btn");
-let themeBtn=document.querySelector("#theme")
-let newGame=document.querySelector("#new-game")
-let msgcontainer=document.querySelector(".msg")
-let msg=document.querySelector("#message")
-// alternate turn
-let turn0=true;
-//winning patterns
-const winPatterns=[
-    [0,1,2],[3,4,5],[6,7,8],
-    [0,3,6],[1,4,7],[2,5,8],
-    [0,4,8],[2,4,6]
-];
+document.addEventListener('DOMContentLoaded', () => {
+    const cells = document.querySelectorAll('.cell');
+    const resetButton = document.getElementById('reset-button');
+    const xScoreDisplay = document.getElementById('x-score');
+    const oScoreDisplay = document.getElementById('o-score');
+    const winningMessageDisplay = document.getElementById('winning-message');
+    const winningLine = document.getElementById('winning-line');
 
-const resetGame = () =>{
-    let turn0=true;
-    enableBox();
-    msgcontainer.classList.add("hide");
+    let currentPlayer = 'X';
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let gameActive = true;
+    let xWins = 0;
+    let oWins = 0;
 
-};
+    const winningConditions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+    ];
 
-//box for clicks
-boxes.forEach((box)=>{
-    box.addEventListener("click", ()=>{
-        console.log("box clicked");
-        if(turn0){
-            box.innerText="O";
-            turn0=false;
-        }else{
-            box.innerText="X";
-            turn0=true;
+    function handleCellClick(event) {
+        const clickedCell = event.target;
+        const clickedCellIndex = parseInt(clickedCell.getAttribute('data-cell-index'));
+
+        if (board[clickedCellIndex] !== '' || !gameActive) {
+            return;
         }
-        box.disabled=true;
-        checkWinner();
-    });
-});
 
-//disable buttons
-const disableBox= () =>{
-    boxes.forEach((box)=>{
-        box.disabled=true;
-    })
-    // for(let box of boxes){
-    //     box.disabled=true;
-    // }
-}
-// Enable Box
-const enableBox= () =>{
-    boxes.forEach((box)=>{
-        box.disabled=false;
-        box.innerText="";
-    })
-}
+        board[clickedCellIndex] = currentPlayer;
+        clickedCell.textContent = currentPlayer;
 
-//Reset Button
-
-//showing the winner
-const showWinner=(winner)=>{
-    msg.innerText="Player "+winner+" wins!";
-    msgcontainer.classList.remove("hide");
-    disableBox()
-
-}
-
-// check winner
-const checkWinner= ()=>{
-    for (let pattern of winPatterns){
-            let pos1val=boxes[pattern[0]].innerText;
-            let pos2val=boxes[pattern[1]].innerText;
-            let pos3val=boxes[pattern[2]].innerText;
-
-            if (pos1val!="" && pos2val!="" && pos3val!="" ){
-                if (pos1val===pos2val && pos2val===pos3val){
-                    console.log("Winner", pos1val);
-                    showWinner(pos1val);
-            }
+        checkResult(clickedCellIndex);
     }
-};
-};
 
-resetBtn.addEventListener("click", resetGame);
-newGame.addEventListener("click", resetGame);
+    function checkResult(lastClickedIndex) {
+        let roundWon = false;
+        let winningCondition = null;
+
+        for (let i = 0; i < winningConditions.length; i++) {
+            const condition = winningConditions[i];
+            let a = board[condition[0]];
+            let b = board[condition[1]];
+            let c = board[condition[2]];
+
+            if (a === '' || b === '' || c === '') {
+                continue;
+            }
+            if (a === b && b === c) {
+                roundWon = true;
+                winningCondition = condition;
+                break;
+            }
+        }
+
+        if (roundWon) {
+            winningMessageDisplay.textContent = `${currentPlayer} has won!`;
+            gameActive = false;
+            if (currentPlayer === 'X') {
+                xWins++;
+                xScoreDisplay.textContent = `X: ${xWins}`;
+            } else {
+                oWins++;
+                oScoreDisplay.textContent = `O: ${oWins}`;
+            }
+            drawWinningLine(winningCondition);
+            return;
+        }
+
+        let roundDraw = !board.includes('');
+        if (roundDraw) {
+            winningMessageDisplay.textContent = 'Game ended in a draw!';
+            gameActive = false;
+            return;
+        }
+
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    }
+
+    function drawWinningLine(condition) {
+        const firstCell = cells[condition[0]];
+        const lastCell = cells[condition[2]];
+
+        const gameBoard = document.getElementById('game-board');
+        const gameBoardRect = gameBoard.getBoundingClientRect();
+
+        const firstCellRect = firstCell.getBoundingClientRect();
+        const lastCellRect = lastCell.getBoundingClientRect();
 
 
+        const startX = firstCellRect.left + firstCellRect.width / 2 - gameBoardRect.left;
+        const startY = firstCellRect.top + firstCellRect.height / 2 - gameBoardRect.top;
+        const endX = lastCellRect.left + lastCellRect.width / 2 - gameBoardRect.left;
+        const endY = lastCellRect.top + lastCellRect.height / 2 - gameBoardRect.top;
 
+        const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+        const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
 
+        winningLine.style.left = `${startX}px`;
+        winningLine.style.top = `${startY}px`;
+        winningLine.style.width = `${length}px`;
+        winningLine.style.transform = `rotate(${angle}deg)`;
+        winningLine.style.transformOrigin = 'left center';
+        winningLine.style.height = '5px'; // Ensure line is visible
+    }
 
+    function resetGame() {
+        currentPlayer = 'X';
+        board = ['', '', '', '', '', '', '', '', ''];
+        gameActive = true;
+        cells.forEach(cell => {
+            cell.textContent = '';
+        });
+        winningMessageDisplay.textContent = '';
+        winningLine.style.width = '0';
+        winningLine.style.height = '0';
+        winningLine.classList.remove('horizontal', 'vertical', 'diagonal-1', 'diagonal-2');
+    }
 
+    // Initial display of scores
+    xScoreDisplay.textContent = `X: ${xWins}`;
+    oScoreDisplay.textContent = `O: ${oWins}`;
 
-
-
-themeBtn.addEventListener('click', () => {
-      document.body.classList.toggle('dark');
-    });
+    cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+    resetButton.addEventListener('click', resetGame);
+});
